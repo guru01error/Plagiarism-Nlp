@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Plagiarism Checker</title>
+
+<style>
+
+body{
+font-family:Arial;
+margin:40px;
+}
+
+textarea{
+
+width:45%;
+height:250px;
+}
+
+table{
+
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+}
+
+table,th,td{
+
+border:1px solid black;
+padding:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Plagarism Checker</h1>
+
+<form method="POST">
+
+<textarea name="text1" placeholder="Paste First Document"></textarea>
+
+<textarea name="text2" placeholder="Paste Second Document"></textarea>
+
+<br><br>
+
+<input type="submit" value="Check">
+
+</form>
+
+{% if plagarism %}
+
+<h2>Plagiarism Score : {{plagarism}}%</h2>
+
+<table>
+
+<tr>
+
+<th>Sentence 1</th>
+<th>Sentence 2</th>
+<th>Similarity</th>
+
+</tr>
+
+{% for item in matches %}
+
+<tr>
+
+<td>{{item['Sentence 1']}}</td>
+
+<td>{{item['Sentence 2']}}</td>
+
+<td>{{item['Similarity']}}%</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+{% endif %}
+
+</body>
+
+</html>
