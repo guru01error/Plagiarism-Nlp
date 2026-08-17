@@ -1,88 +1,117 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-
-<title>Plagiarism Checker</title>
-
-<style>
-
-body{
-font-family:Arial;
-margin:40px;
-}
-
-textarea{
-
-width:45%;
-height:250px;
-}
-
-table{
-
-width:100%;
-border-collapse:collapse;
-margin-top:20px;
-}
-
-table,th,td{
-
-border:1px solid black;
-padding:10px;
-}
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plagiarism Checker</title>
+    <!-- Tailwind CSS CDN for instant modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
 
-<body>
+<body class="bg-slate-50 min-h-screen py-10 px-4 sm:px-8">
+    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-100 p-6 sm:p-10">
+        
+        <!-- Header Section -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-slate-800 tracking-tight">
+                Plagiarism Checker
+            </h1>
+            <p class="text-slate-500 text-sm sm:text-base mt-2">
+                Compare two text documents to detect exact matches and semantic similarity instantly.
+            </p>
+        </div>
 
-<h1>Plagarism Checker</h1>
+        <!-- Input Form -->
+        <form method="POST" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">First Document</label>
+                    <textarea 
+                        name="text1" 
+                        placeholder="Paste your source text here..." 
+                        required
+                        class="w-full h-64 p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-none bg-slate-50/50 text-slate-700 placeholder-slate-400 text-sm"
+                    ></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Second Document</label>
+                    <textarea 
+                        name="text2" 
+                        placeholder="Paste text to compare against..." 
+                        required
+                        class="w-full h-64 p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-none bg-slate-50/50 text-slate-700 placeholder-slate-400 text-sm"
+                    ></textarea>
+                </div>
+            </div>
 
-<form method="POST">
+            <div class="text-center pt-2">
+                <button 
+                    type="submit" 
+                    class="w-full sm:w-auto px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl shadow-md shadow-indigo-200 transition-all cursor-pointer text-sm"
+                >
+                    Analyze Similarity
+                </button>
+            </div>
+        </form>
 
-<textarea name="text1" placeholder="Paste First Document"></textarea>
+        <!-- Results Section -->
+        {% if plagarism %}
+        <div class="mt-12 pt-8 border-t border-slate-100">
+            
+            <!-- Dynamic Plagiarism Score Badge -->
+            <div class="flex flex-col sm:flex-row items-center justify-between p-6 rounded-2xl mb-8 
+                {% if plagarism|float > 50 %} bg-red-50 border border-red-100 text-red-900
+                {% elif plagarism|float > 20 %} bg-amber-50 border border-amber-100 text-amber-900
+                {% else %} bg-emerald-50 border border-emerald-100 text-emerald-900 {% endif %}">
+                
+                <div>
+                    <h3 class="text-lg font-bold">Analysis Complete</h3>
+                    <p class="text-xs sm:text-sm opacity-80">Overall similarity detected across submitted content.</p>
+                </div>
 
-<textarea name="text2" placeholder="Paste Second Document"></textarea>
+                <div class="mt-4 sm:mt-0 text-right">
+                    <span class="text-3xl font-extrabold">{{ plagarism }}%</span>
+                    <span class="block text-xs font-semibold uppercase tracking-wider">Similarity Score</span>
+                </div>
+            </div>
 
-<br><br>
+            <!-- Matches Table -->
+            {% if matches %}
+            <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+                <table class="w-full text-left border-collapse bg-white">
+                    <thead class="bg-slate-100 border-b border-slate-200 text-slate-600 text-xs font-semibold uppercase tracking-wider">
+                        <tr>
+                            <th class="p-4 w-5/12">Document 1 Match</th>
+                            <th class="p-4 w-5/12">Document 2 Match</th>
+                            <th class="p-4 w-2/12 text-center">Match %</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-sm text-slate-700">
+                        {% for item in matches %}
+                        <tr class="hover:bg-slate-50/80 transition-colors">
+                            <td class="p-4 font-mono text-xs bg-slate-50/50 rounded-lg m-1">{{ item['Sentence 1'] }}</td>
+                            <td class="p-4 font-mono text-xs bg-slate-50/50 rounded-lg m-1">{{ item['Sentence 2'] }}</td>
+                            <td class="p-4 text-center font-semibold text-slate-900">
+                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
+                                    {{ item['Similarity'] }}%
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
 
-<input type="submit" value="Check">
+        </div>
+        {% endif %}
 
-</form>
-
-{% if plagarism %}
-
-<h2>Plagiarism Score : {{plagarism}}%</h2>
-
-<table>
-
-<tr>
-
-<th>Sentence 1</th>
-<th>Sentence 2</th>
-<th>Similarity</th>
-
-</tr>
-
-{% for item in matches %}
-
-<tr>
-
-<td>{{item['Sentence 1']}}</td>
-
-<td>{{item['Sentence 2']}}</td>
-
-<td>{{item['Similarity']}}%</td>
-
-</tr>
-
-{% endfor %}
-
-</table>
-
-{% endif %}
-
+    </div>
 </body>
 
 </html>
